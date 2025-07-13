@@ -69,9 +69,13 @@ vagrant destroy
 # Remover cash .vagrant
 rm .vagrant
 
-# Por padrão, ao iniciar uma VM através do vagrant todos os arquivos do diretório são copiados para dentro da VM no diretório /vagrant.
+# Por padrão, ao iniciar uma VM através do vagrant todos os arquivos do diretório \
+# são copiados para dentro da VM no diretório /vagrant.
 
-# Caso não consiga fazer cópia de arquivos da VM:Localhost ou Localhost:VM será preciso instalar um plugin através do terminal. Se der erro de 'Unable to resolve dependency: user requested 'vargrant-scp (> 0)', execute novamente o comando abaixo.
+# Caso não consiga fazer cópia de arquivos da VM:Localhost ou Localhost:VM será \
+# preciso instalar um plugin através do terminal. Se der erro de \ 
+#'Unable to resolve dependency: user requested 'vargrant-scp (> 0)', \
+# execute novamente o comando abaixo.
 vagrant plugin install vargrant-scp
 
 # Cópia de Arquivo VM:LOCALHOST
@@ -95,7 +99,8 @@ vagrant ssh de92113
 
 # Cópia de Arquivo LOCALHOST:VM
 
-# Todo arquivo criado direto na pasta raiz de onde foi executado o provisionamento, automaticamente será copiado para dentro do diretório /vagrant.
+# Todo arquivo criado direto na pasta raiz de onde foi executado \
+#o provisionamento, automaticamente será copiado para dentro do diretório /vagrant.
 
 # Acesse o diretório raiz 
 vagrant scp README.md  ID_VM:/tmp 
