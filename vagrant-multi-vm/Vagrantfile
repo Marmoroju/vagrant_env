@@ -1,0 +1,28 @@
+# Variáveis de configuração
+MACHINES = [
+  { name: "starter", ip: "192.168.56.5", memory: 2048, cpus: 2 },
+  { name: "dev",     ip: "192.168.56.6", memory: 1024, cpus: 1 },
+  # Adicione mais máquinas conforme necessário
+]
+
+BOX_NAME = "bento/ubuntu-22.04"
+SCRIPT = "provision.sh"
+PORT_FORWARD = { guest: 80, host: 8080 }
+
+Vagrant.configure("2") do |config|
+  MACHINES.each do |machine|
+    config.vm.define machine[:name] do |vm|
+      vm.vm.box = BOX_NAME
+      vm.vm.network "private_network", ip: machine[:ip]
+      vm.vm.hostname = machine[:name]
+      #vm.vm.network :forwarded_port, guest: PORT_FORWARD[:guest], host: PORT_FORWARD[:host]
+      vm.vm.provision "shell", path: SCRIPT
+
+      vm.vm.provider "virtualbox" do |v|
+        v.name = machine[:name]
+        v.memory = machine[:memory]
+        v.cpus = machine[:cpus]
+      end
+    end
+  end
+end

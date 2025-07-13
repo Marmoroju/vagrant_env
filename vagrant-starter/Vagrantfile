@@ -1,0 +1,18 @@
+# Variáveis de configuração
+NAME = "starter"
+BOX_NAME = "bento/ubuntu-22.04"
+
+Vagrant.configure("2") do |config|
+    config.vm.define NAME do |vm_starter|
+        vm_starter.vm.box = BOX_NAME
+        vm_starter.vm.network "private_network", ip: "192.168.56.5"
+        vm_starter.vm.hostname = NAME
+        #vm_starter.vm.network :forwarded_port, guest: 8080, host: 80
+        vm_starter.vm.provision "shell", path: "provision.sh"
+        vm_starter.vm.provider "virtualbox" do |v|
+            v.name = NAME
+            v.memory = 2048
+            v.cpus = 2
+        end
+    end
+end
