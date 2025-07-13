@@ -11,7 +11,7 @@ Este projeto utiliza o Vagrant para criar e gerenciar ambientes de máquinas vir
 
 ## Vagrant
 - O que é?
-    - O Vagrant é uma ferramenta CLI criada em Ruby e pertencente a empresa [Hashcorp](https://www.hashicorp.com/pt) capaz de gerenciar e provisionar VMs. 
+    - O Vagrant é uma ferramenta CLI criada em Ruby e pertencente a empresa [Hashicorp](https://www.hashicorp.com/pt) capaz de gerenciar e provisionar VMs. 
     - Em outras palavras, o Vagrant é uma ferramenta que facilita a criação e configuração de ambientes virtuais usando arquivos de configuração legíveis e reutilizáveis. Ele permite que você defina máquinas com sistemas operacionais, rede, memória, CPUs e scripts de provisionamento com facilidade.
 
 - Por quê o Vagrant?
@@ -75,9 +75,9 @@ rm .vagrant
 vagrant plugin install vargrant-scp
 
 # Cópia de Arquivo VM:LOCALHOST
-scp ARQUIVO PATH
-#EXEMPLO
-TOUCH texto.txt
+# scp ARQUIVO PATH
+# Exemplo, acesse a vm e execute os comandos abaixo:
+touch texto.txt
 scp texto.txt vagrant-starter 
 
 # Status globais como ID das VMs sendo executados.
@@ -143,7 +143,7 @@ OBS.: Precisa validar, mas o passo a passo é esse.
 - `vagrant package --base nome_da_sua_vm_no_virtualbox`
 - Isso criará um arquivo package.box no diretório atual.
 - Ex.: `vagrant package --base Vagrant`
-- A exportação da VM é um pouco demorada (Depndendo da configuração do PC).
+- A exportação da VM é um pouco demorada (Dependendo da configuração do PC).
 - Logo após exportar, será realizada a compressão do arquivo que levará um tempo também.
 - O Arquivo final terá em média 5GB a 6GB mais ou menos.
 
