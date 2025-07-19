@@ -6,6 +6,7 @@ Este projeto utiliza o Vagrant para criar e gerenciar ambientes de máquinas vir
 - [Vagrant](https://developer.hashicorp.com/vagrant)
 - [Vagrant Boxes](https://portal.cloud.hashicorp.com/vagrant/discover)
 - [Virtual Box](https://www.virtualbox.org/wiki/Downloads)
+- [VM Windows com Vagrantfile](https://developer.hashicorp.com/vagrant/docs/vagrantfile/winrm_settings)
 - [Configuração adicional do Virtual Box - modifyvm](https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifyvm.html)
 - [Alterar espaço em disco](https://docs.oracle.com/en/virtualization/virtualbox/6.0/user/vboxmanage-modifymedium.html)
 
@@ -30,13 +31,50 @@ Antes de iniciar a instalação, confirme se o seu `Hyper-V` está desabilitado 
     - Instalação simples. Faça o Download da última versão e next, next...
     - No momento a versão instalada nesse passo a passo é a `7.1.10` em um Windows 11.
 
-- Pode requerer a instalação do Microsoft Visual C++ 2019+. Clique [AQUI](https://learn.microsoft.com/pt-br/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022) para seguir para a página de download e baixar a versão compatível com seu Sistema Operacional. Aqui foi baixado o instalador `vc_redist.x64.exe`
+    - Pode requerer a instalação do Microsoft Visual C++ 2019+ para instalar o Virtual Box. Clique [AQUI](https://learn.microsoft.com/pt-br/cpp/windows/latest-supported-vc-redist?view=msvc-170#visual-studio-2015-2017-2019-and-2022) para seguir para a página de download e baixar a versão compatível com seu Sistema Operacional. Aqui foi baixado o instalador `vc_redist.x64.exe`
 
 - Vagrant
     - Acesse esse [link](https://developer.hashicorp.com/vagrant/install) e baixe o instalador de acordo com a versão do seu sistema operacional.
     - Instalação simples. Faça o Download da última versão e next, next...
     - Abra seu terminal e digite `vagrant vbguest --version` para saber se completou a instalação e a versão instalada. No momento a versão instalada nesse passo a passo é a `2.4.7` em um Windows 11.
     - Caso ocorra algum erro de plugin, ele poderá estar relacionado ao `vbguest` e sua versão, podendo ser a respeito de compatibilidade com o provider do Virtual Box, às vezes precisando ser apontado, ou plugin adicional que precisa ser instalado por ele.
+
+## Execução das VM
+As boxes criadas pela comunidade possuem o usuário `vagrant` além do root. Para verificar as permissões de grupo que ele está incluso, basta acessar a VM e executar o comando abaixo.
+```bash
+# Permissões de grupo
+cat /etc/group | grep vagrant
+
+# Usuários
+cat /etc/passwd | grep bash
+```
+
+`Configuração de rede:` Conforme definido no arquivo de provisionamento o ip 192.168.56.5 para esta VM pode ser conferido através deste comando. `eth0` refere-se a rede interna do Virtual Box e o `eth1` será a rede bridge por onde redes externas, como seu `local` conectam-se a sua VM.
+```bash
+ip -4 a
+``` 
+
+`Docker:` Para testar se a sua VM se conecta através do IP definido e porta externa liberada, basta acessá-la e criar um container, acessando através do `IP:Porta`. Execute o comando abaixo e acesse-o através do IP `http://192.168.56.5:8080`
+```bash
+docker container run -d -p 8080:80 nginx
+```
+
+`forwarded_port:` ele mapeia uma porta da máquina física (seu localhost) para uma porta da máquina virtual (guest - VM). E aí entra o detalhe importante: duas máquinas virtuais não podem compartilhar a mesma porta do host. Por exemplo, `vm.vm.network :forwarded_port, guest: 80, host: 8080`, dessa forma você está dizendo: "Tudo que chegar na porta 8080 da minha máquina física (host), quero que vá pra porta 80 da VM que estiver escutando aqui. Se você fizer isso para duas ou mais VMs, o Vagrant não consegue completar a operação porque a porta 8080 já está ocupada pelo mapeamento da primeira VM."
+
+`provision.sh:` Este arquivo é um shell script que é executado durante o provisionamento da VM Linux e chamado através do parâmetro `vm_starter.vm.provision "shell", path: "provision.sh"`. Nesse arquivo podem ser passados os comandos do terminal para fazer um update, instalação ou outra configuração, da mesma forma e ordem em que você executaria manualmente e conforme a sua distribuição. Exemplo:
+```bash
+#!/bin/bash
+
+sudo apt-get -y update
+
+comando 2
+comando 3
+comando n
+```
+`windows-server:` Pelo vagrant também é possível iniciar servidores Windows, porém se baseiam na sua rede bridge do seu adaptador principal e não do Virtual Box.
+
+## Iniciar 2+ VMs 
+O diretório `vagrant-multi-vm` contém o script para executar mais de uma VM ao mesmo tempo. Os comandos de execução serão os mesmos.
 
 ## Como usar
 Para começar, acesse o diretório `vagrant-starter`.
@@ -105,32 +143,6 @@ vagrant ssh de92113
 # Acesse o diretório raiz 
 vagrant scp README.md  ID_VM:/tmp 
 ```
-
-## Execução das VM
-As boxes criadas pela comunidade possuem o usuário `vagrant` além do root. Para verificar as permissões de grupo que ele está incluso, basta acessar a VM e executar o comando abaixo.
-```bash
-# Permissões de grupo
-cat /etc/group | grep vagrant
-
-# Usuários
-cat /etc/passwd | grep bash
-```
-
-`Configuração de rede:` Conforme definido no arquivo de provisionamento o ip 192.168.56.5 para esta VM pode ser conferido através deste comando. `eth0` refere-se a rede interna do Virtual Box e o `eth1` será a rede bridge por onde redes externas, como seu `local` conectam-se a sua VM.
-```bash
-ip -4 a
-``` 
-
-`Docker:` Para testar se a sua VM se conecta através do IP definido e porta externa liberada, basta acessá-la e criar um container, acessando através do `IP:Porta`. Execute o comando abaixo e acesse-o através do IP `http://192.168.56.5:8080`
-```bash
-docker container run -d -p 8080:80 nginx
-```
-
-`forwarded_port`: ele mapeia uma porta da máquina física (seu localhost) para uma porta da máquina virtual (guest - VM). E aí entra o detalhe importante: duas máquinas virtuais não podem compartilhar a mesma porta do host. Por exemplo, `vm.vm.network :forwarded_port, guest: 80, host: 8080`, dessa forma você está dizendo: "Tudo que chegar na porta 8080 da minha máquina física (host), quero que vá pra porta 80 da VM que estiver escutando aqui. Se você fizer isso para duas ou mais VMs, o Vagrant não consegue completar a operação porque a porta 8080 já está ocupada pelo mapeamento da primeira VM."
-
-
-## Iniciar 2+ VMs 
-O diretório `vagrant-multi-vm` contém o script para executar mais de uma VM ao mesmo tempo. Os comandos de execução serão os mesmos.
  
 # Adicional - Criar a própria box
 OBS.: Precisa validar, mas o passo a passo é esse.
